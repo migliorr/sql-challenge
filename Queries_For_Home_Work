@@ -1,0 +1,139 @@
+drop table employees;
+create table employees (
+ emp_no integer not null primary key,
+ birth_date date not null,
+ First_name varchar(60) not null,
+ last_name varchar(60) not null,
+ gender varchar(1),
+ hire_date date not null);
+ 
+ -----------------
+ drop table departments;
+ create table departments (
+ dept_no varchar(4) not null primary key,
+ dept_name varchar(60));
+ 
+ ---------------------
+ drop table dept_manager;
+ 
+ create table dept_manager (
+ dept_no varchar(4) not null,
+ emp_no integer not null ,
+ from_date date,
+ to_date date,
+ primary key (dept_no, emp_no),
+ constraint emp_no_fkey foreign key (emp_no)
+    references employees (emp_no),
+ constraint dep_no_fkey foreign key (dept_no)
+    references departments (dept_no));
+
+---------------------------
+--Create table Salaries
+drop table salaries;
+create table salaries (
+ emp_no integer not null primary key,
+ salary decimal not null,
+ from_date date,
+ to_date date);
+
+--------------------------
+--Create table Titles
+create table titles (
+ emp_no integer not null primary key,
+ title varchar(40),
+ from_date date,
+ to_date date);
+ 
+ -----------------------------
+ --Create Table dept_emp
+ create table dept_emp (
+ emp_no integer not null,
+ dept_no varchar(4) not null ,
+ from_date date,
+ to_date date,
+ primary key (emp_no, dept_no ),
+ constraint emp_no_fkey foreign key (emp_no)
+    references employees (emp_no),
+ constraint dep_no_fkey foreign key (dept_no)
+    references departments (dept_no));
+	
+--1----------------------------------
+--1 List employee number, last name, first name, gender and salary:
+select  salaries.emp_no, last_name, first_name, gender, salary
+ from salaries inner join employees on salaries.emp_no = employees.emp_no;
+ 
+ --2----------------------------------
+--2 List employee hired in 1986
+select  salaries.emp_no, last_name, first_name, gender, salary, hire_date
+ from salaries inner join employees on salaries.emp_no = employees.emp_no
+ where extract('year' from  hire_date) = 1986;
+ 
+--3----------------------------------------
+==3 List manager of each depto, with depto_number, depto name, manager's emp_no, 
+    last number, first name, start and end of employment date
+select 
+   dept_manager.dept_no,
+   dept_name, dept_manager.emp_no, 
+   employees.last_name, 
+   employees.first_name, 
+   dept_manager.from_date, 
+   dept_manager.to_date 
+ from dept_manager inner join departments on dept_manager.dept_no = departments.dept_no
+                   inner join employees on dept_manager.emp_no = employees.emp_no;
+ 
+
+ --4----------------------
+ --4 List dept of each employee with following info: employee number, last name, first name and depto.
+ 
+  select 
+   employees.emp_no,    
+   employees.last_name, 
+   employees.first_name 
+   dept_name
+  from dept_emp inner join employees on dept_emp.emp_no = employees.emp_no
+             inner join departments on dept_emp.dept_no = departments.dept_no;
+  
+  
+  --5----------------------
+ --5 List all employees whose first name is Hercules and last begin with B
+ 
+  select 
+   employees.emp_no,    
+   employees.last_name, 
+   employees.first_name    
+  from employees where first_name = 'Hercules' and last_name like 'B%';
+  
+  --6----------------------
+ --6 List all employees in Sales depto, including emp_no, last name, first name and depto name
+ 
+  select 
+   employees.emp_no,    
+   employees.last_name, 
+   employees.first_name, 
+   dept_name
+  from dept_emp inner join employees on dept_emp.emp_no = employees.emp_no
+             inner join departments on dept_emp.dept_no = departments.dept_no
+  where dept_name = 'Sales';
+  
+ --7----------------------
+ --7 List all employees in Sales depto and dev depto, including emp_no, last name, first name and depto name
+ 
+  select 
+   employees.emp_no,    
+   employees.last_name, 
+   employees.first_name, 
+   dept_name
+  from dept_emp inner join employees on dept_emp.emp_no = employees.emp_no
+             inner join departments on dept_emp.dept_no = departments.dept_no
+  where dept_name = 'Sales' or dept_name = 'Development';
+  
+ --8----------------------
+ --8 In descending order, list the frequency count of employee last names
+ 
+  select 
+   last_name, 
+   count(last_name)
+   from employees group by last_name;
+             
+ 
+ 
